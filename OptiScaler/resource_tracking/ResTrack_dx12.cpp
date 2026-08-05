@@ -2368,13 +2368,9 @@ void ResTrack_Dx12::SetResourceCmdList(FG_ResourceType type, ID3D12GraphicsComma
         _resourceCommandList[index][type] = realCmdList;
         LOG_DEBUG("_resourceCommandList[{}][{}]: {:X}", index, magic_enum::enum_name(type), (size_t) realCmdList);
     }
-  LOG_DEBUG("_resourceCommandList[{}][{}]: {:X}", index, magic_enum::enum_name(type), (size_t) realCmdList);
-    }
-}                                                          ← 이 줄을 새로 추가해주세요
+}
 
 void ResTrack_Dx12::DumpTrackedResources(UINT64 width, UINT64 height)
-{
-  void ResTrack_Dx12::DumpTrackedResources(UINT64 width, UINT64 height)
 {
     LOG_INFO("---- DumpTrackedResources: scanning for resources matching {}x{} ----", width, height);
 
@@ -2394,8 +2390,7 @@ void ResTrack_Dx12::DumpTrackedResources(UINT64 width, UINT64 height)
 
             matchCount++;
 
-            LOG_INFO("Candidate resource #{}: ptr={:X}, {}x{}, format={}, type={}, flags={}, state={}, "
-                     "lastUsedFrame={:.0f}",
+            LOG_INFO("Candidate resource #{}: ptr={:X}, {}x{}, format={}, type={}, flags={}, state={}, lastUsedFrame={:.0f}",
                      matchCount, (size_t) info->buffer, info->width, info->height,
                      magic_enum::enum_name(info->format), magic_enum::enum_name(info->type),
                      (unsigned int) info->flags, magic_enum::enum_name(info->state), info->lastUsedFrame);
@@ -2403,5 +2398,4 @@ void ResTrack_Dx12::DumpTrackedResources(UINT64 width, UINT64 height)
     }
 
     LOG_INFO("---- DumpTrackedResources: found {} matching resources ----", matchCount);
-}
 }

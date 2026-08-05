@@ -787,7 +787,15 @@ bool FSRDFeatureDx12::PrepareDenoiseConvInput(const NVSDK_NGX_Parameter& inParam
         isReady = false;
 
     // DLSSD-specific buffers
-    if (!TryGetLoggedResource(inParams, NVSDK_NGX_Parameter_GBuffer_Normals, _convDesc.Resources.InNormals))
+  // DLSSD-specific buffers
+    // NOTE: Some titles (observed with Cyberpunk 2077) do not populate the "DLSS.Input.*" style
+    // keys for these G-buffer resources, but may still expose equivalent data under the alternate
+    // "GBuffer.*" key naming defined in the official NVIDIA NGX headers (see nvsdk_ngx_defs.h /
+    // nvsdk_ngx_helpers_vk.h). We try the primary key first, then fall back to the alternate name
+    // before giving up, so we don't unnecessarily bypass the denoiser when the data actually exists
+    // under a different key.
+    if (!TryGetLoggedResource(inParams, NVSDK_NGX_Parameter_GBuffer_Normals, _convDesc.Resources.InNormals) &&
+        !TryGetLoggedResource(inParams, "DLSS.Input.Normals", _convDesc.Resources.InNormals))
         isReady = false;
 
     // If roughness is not packed into normals, then this texture is mandatory.
@@ -799,10 +807,14 @@ bool FSRDFeatureDx12::PrepareDenoiseConvInput(const NVSDK_NGX_Parameter& inParam
         s_isRoughnessPacked = true;
     }
 
-    if (!TryGetLoggedResource(inParams, NVSDK_NGX_Parameter_DiffuseAlbedo, _convDesc.Resources.InDiffAlbedo))
+    if (!TryGetLoggedResource(inParams, NVSDK_NGX_Parameter_DiffuseAlbedo, _convDesc.Resources.InDiffAlbedo) &&
+        !TryGetLoggedResource(inParams, NVSDK_NGX_Parameter_GBuffer_DiffuseAlbedo, _convDesc.Resources.InDiffAlbedo) &&
+        !TryGetLoggedResource(inParams, NVSDK_NGX_Parameter_GBuffer_Albedo, _convDesc.Resources.InDiffAlbedo))
         isReady = false;
 
-    if (!TryGetLoggedResource(inParams, NVSDK_NGX_Parameter_SpecularAlbedo, _convDesc.Resources.InSpecAlbedo))
+    if (!TryGetLoggedResource(inParams, NVSDK_NGX_Parameter_SpecularAlbedo, _convDesc.Resources.InSpecAlbedo) &&
+        !TryGetLoggedResource(inParams, NVSDK_NGX_Parameter_GBuffer_SpecularAlbedo, _convDesc.Resources.InSpecAlbedo) &&
+        !TryGetLoggedResource(inParams, NVSDK_NGX_Parameter_GBuffer_Specular, _convDesc.Resources.InSpecAlbedo))
         isReady = false;
 
     TryGetNGXVoidPointer(inParams, NVSDK_NGX_Parameter_DLSS_Input_Bias_Current_Color_Mask, _convDesc.Resources.InBiasMask);

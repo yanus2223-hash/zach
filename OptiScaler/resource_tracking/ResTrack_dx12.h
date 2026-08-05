@@ -446,4 +446,5 @@ class ResTrack_Dx12
     static void ReleaseDeviceHooks();
     static void ClearPossibleHudless();
     static void SetResourceCmdList(FG_ResourceType type, ID3D12GraphicsCommandList* cmdList);
+static void DumpTrackedResources(UINT64 width, UINT64 height);
 };

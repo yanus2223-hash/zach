@@ -231,6 +231,40 @@ void IFeature::GetRenderResolution(const NVSDK_NGX_Parameter* InParameters, unsi
         } while (false);
     }
 
+    // Some titles (e.g. Cyberpunk 2077 with Path Tracing) issue Evaluate() calls for auxiliary
+    // passes (reflection denoise guide buffers, etc.) that carry a Render_Subrect_Dimensions
+    // far smaller than the actual frame's render resolution. Blindly trusting that value corrupts
+    // _renderWidth/_renderHeight for the rest of the pipeline and the image gets upscaled from
+    // (and displayed at) that bogus low resolution. If the quirk is active, ignore updates that
+    // shrink the established render resolution by more than half unless we don't have a
+    // resolution established yet.
+    if (State::Instance().gameQuirks & GameQuirk::IgnoreSpuriousSmallSubrect && _renderWidth > 0 &&
+        _renderHeight > 0)
+    {
+        const bool widthCollapsed = *OutWidth > 0 && *OutWidth * 2 < _renderWidth;
+        const bool heightCollapsed = *OutHeight > 0 && *OutHeight * 2 < _renderHeight;
+
+        if (widthCollapsed || heightCollapsed)
+        {
+            LOG_WARN("Ignoring spurious subrect {0}x{1}, keeping established render resolution {2}x{3}", *OutWidth,
+                     *OutHeight, _renderWidth, _renderHeight);
+
+            *OutWidth = _renderWidth;
+            *OutHeight = _renderHeight;
+
+            // Still record jitter below, but skip the resolution overwrite
+            JitterInfo ji {};
+            if (_jitterInfo.size() < 350 &&
+                InParameters->Get(NVSDK_NGX_Parameter_Jitter_Offset_X, &ji.x) == NVSDK_NGX_Result_Success &&
+                InParameters->Get(NVSDK_NGX_Parameter_Jitter_Offset_Y, &ji.y) == NVSDK_NGX_Result_Success)
+            {
+                _jitterInfo.insert(std::make_pair(ji.x, ji.y));
+            }
+
+            return;
+        }
+    }
+
     _renderWidth = *OutWidth;
     _renderHeight = *OutHeight;
 

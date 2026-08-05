@@ -6,6 +6,7 @@
 #include "FSRDFeature_Dx12.h"
 #include "shaders/fsrd_preprocess/FSRDPreprocessor_Dx12.h"
 #include "MathUtils.h"
+#include "resource_tracking/ResTrack_dx12.h"
 
 using namespace DirectX;
 using namespace OptiMath;

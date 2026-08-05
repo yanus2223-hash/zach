@@ -60,6 +60,8 @@ enum class GameQuirk : uint64_t
     CreateD3D12DeviceForLuma,
     ForceCreateD3D12Device,
     ForceDepthD32S8,
+    IgnoreSpuriousSmallSubrect, // Ignore Render_Subrect_Dimensions updates that shrink far below the
+                                // established render resolution (e.g. CP2077 Path Tracing reflection pass)
     // Don't forget to add the new entry to printQuirks
     _
 };
@@ -164,7 +166,7 @@ static const QuirkEntry quirkTable[] = {
     // Cyberpunk 2077
     // SL spoof enough to unlock everything DLSS
     QUIRK_ENTRY("cyberpunk2077.exe", GameQuirk::CyberpunkHudlessState, GameQuirk::FSRFGHudlessMismatchFixup,
-                GameQuirk::DisableHudfix, GameQuirk::DisableDxgiSpoofing),
+                GameQuirk::DisableHudfix, GameQuirk::DisableDxgiSpoofing, GameQuirk::IgnoreSpuriousSmallSubrect),
 
     // Forza Horizon 5
     // SL spoof enough to unlock everything DLSS

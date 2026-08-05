@@ -2368,6 +2368,12 @@ void ResTrack_Dx12::SetResourceCmdList(FG_ResourceType type, ID3D12GraphicsComma
         _resourceCommandList[index][type] = realCmdList;
         LOG_DEBUG("_resourceCommandList[{}][{}]: {:X}", index, magic_enum::enum_name(type), (size_t) realCmdList);
     }
+  LOG_DEBUG("_resourceCommandList[{}][{}]: {:X}", index, magic_enum::enum_name(type), (size_t) realCmdList);
+    }
+}                                                          ← 이 줄을 새로 추가해주세요
+
+void ResTrack_Dx12::DumpTrackedResources(UINT64 width, UINT64 height)
+{
   void ResTrack_Dx12::DumpTrackedResources(UINT64 width, UINT64 height)
 {
     LOG_INFO("---- DumpTrackedResources: scanning for resources matching {}x{} ----", width, height);
